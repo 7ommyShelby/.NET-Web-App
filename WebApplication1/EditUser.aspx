@@ -27,11 +27,12 @@
             <label class="form-label fw-bold">
                 Card Type
             </label>
-            <asp:DropDownList ID="CardType" runat="server" CssClass="form-control">
+            <asp:DropDownList ID="cardlist" runat="server" CssClass="form-control">
                 <asp:ListItem Text="Select Card Type" Value="" />
                 <asp:ListItem Text="Credit" Value="Credit" />
                 <asp:ListItem Text="Debit" Value="Debit" />
                 <asp:ListItem Text="Prepaid" Value="Prepaid" />
+
             </asp:DropDownList>
 
         </div>

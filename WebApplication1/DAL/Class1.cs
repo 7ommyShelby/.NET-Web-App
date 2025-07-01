@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.UI.WebControls;
-using static WebApplication1.WebForm1;
-using static WebApplication1.EditUser;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace WebApplication1.DAL
 {
 
     public class User
     {
-        public int AccoutNo { get; set; }
+        public int AccountNo { get; set; }
         public string Name { get; set; }
 
         public string CardType { get; set; }
@@ -38,20 +33,10 @@ namespace WebApplication1.DAL
             {
                 conn.Open();
 
-                string query = "SELECT * FROM dbo.Table1";
-
-                //if (!String.IsNullOrWhiteSpace(search))
-                //{
-                //    query += " WHERE Name LIKE @Search OR Account_type LIKE @Search";
-                //}
-
-                using (SqlCommand command = new SqlCommand(query, conn))
+                using (SqlCommand command = new SqlCommand("GetAllUsers", conn))
                 {
 
-                    //if (!string.IsNullOrWhiteSpace(search))
-                    //{
-                    //    command.Parameters.AddWithValue("@Search", "%" + search + "%");   // (search is a param which stores the value after the ","  ,  in this case "search from tetxbox") 
-                    //}
+                    command.CommandType = CommandType.StoredProcedure;
 
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -59,10 +44,10 @@ namespace WebApplication1.DAL
                         {
                             users.Add(new User
                             {
-                                AccoutNo = Convert.ToInt32(reader["A_No"]),
+                                AccountNo = Convert.ToInt32(reader["Account_No"]),
                                 Name = reader["Name"].ToString(),
-                                CardType = reader["Account_Type"].ToString(),
-                                ConnectionStatus = reader["Status"].ToString(),
+                                CardType = reader["CardType"].ToString(),
+                                ConnectionStatus = reader["ConnectionStatus"].ToString(),
                                 DateOfJoin = reader["dateofjoin"] == DBNull.Value ? DateTime.Now : Convert.ToDateTime(reader["dateofjoin"])
                             });
                         }
@@ -74,14 +59,6 @@ namespace WebApplication1.DAL
 
             if (!String.IsNullOrWhiteSpace(search))
             {
-                //foreach (var item in users)
-                //{
-                //    if (item.Name == search || item.CardType == search)
-                //    {
-                //        filterUsers.Add(item);
-                //    }
-                //}
-
                 List<User> filterUsers = users.FindAll((e) =>
                 {
                     return e.Name.ToLower().Contains(search.ToLower()) || e.CardType.ToLower().Contains(search.ToLower());
@@ -91,6 +68,89 @@ namespace WebApplication1.DAL
 
             }
 
+            return users;
+
+        }
+        public int GetActiveUsers()
+        {
+            string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+
+            int users = 0;
+
+            using (var conn = new SqlConnection(strcon))
+            {
+
+                using (var cmd = new SqlCommand("GetActiveUserCount", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    conn.Open();
+
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            users = Convert.ToInt32(reader["ActiveUsers"]);
+                        }
+                    }
+
+
+                    //var output = new SqlParameter("@count", SqlDbType.Int)
+                    //{
+                    //    Direction = ParameterDirection.Output
+                    //};
+
+
+                    //cmd.Parameters.Add(output);
+                    //conn.Open();
+
+                    //cmd.ExecuteNonQuery();
+
+                    //var result = cmd.Parameters["@count"].Value;
+
+                    //if (result != DBNull.Value)
+                    //{
+                    //    users = Convert.ToInt32(result);
+                    //}
+
+                }
+
+                //using (SqlCommand cmd = new SqlCommand("SELECT dbo.ActiveUserCount()", conn))
+                //{
+                //  var result = cmd.ExecuteScalar();
+                //    if (result!=DBNull.Value)
+                //    {
+                //        users = Convert.ToInt32(result);
+                //    }
+                //}
+
+            }
+
+            return users;
+        }
+
+        public int CreditUser()
+        {
+            string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+
+            int users = 0;
+
+            using (SqlConnection conn = new SqlConnection(strcon))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand("SELECT dbo.Credit()", conn))
+                {
+                    var result = cmd.ExecuteScalar();
+
+                    if (result != DBNull.Value)
+                    {
+                        users = Convert.ToInt32(result);
+                    }
+
+                }
+            }
             return users;
 
         }
@@ -107,20 +167,22 @@ namespace WebApplication1.DAL
             {
                 con.Open();
 
-                string query = "INSERT INTO dbo.Table1 (A_No, Name, Account_Type, Status , dateofjoin) VALUES (@AccountNo , @Name, @CardType, @Status, @DateOfJoin)";
+                //string query = "INSERT INTO dbo.Table1 (Account_No, Name, Cardtype, ConnectionStatus , dateofjoin) VALUES (@AccountNo , @Name, @CardType, @Status, @DateOfJoin)";
 
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlCommand cmd = new SqlCommand("AddNewUser", con))
                 {
-                    cmd.Parameters.AddWithValue("@AccountNo", user.AccoutNo);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@AccountNo", user.AccountNo);
                     cmd.Parameters.AddWithValue("@Name", user.Name);
                     cmd.Parameters.AddWithValue("@CardType", user.CardType);
-                    cmd.Parameters.AddWithValue("@Status", user.ConnectionStatus);
-                    cmd.Parameters.AddWithValue("@DateOfJoin", user.DateOfJoin);
+                    cmd.Parameters.AddWithValue("@ConnectionStatus", user.ConnectionStatus);
+                    //cmd.Parameters.AddWithValue("@DateOfJoin", user.DateOfJoin);
+                    cmd.Parameters.Add("@DateOfJoin", SqlDbType.Date).Value = user.DateOfJoin;
 
                     int rows = cmd.ExecuteNonQuery();
                     return rows > 0;
                 }
-
             }
         }
 
@@ -133,7 +195,7 @@ namespace WebApplication1.DAL
             {
                 conn.Open();
 
-                string query = "UPDATE dbo.Table1 SET Name = @Name , Account_type = @CardType ,Status = @Status , dateofjoin = @Date WHERE A_No = @AccountNo";
+                string query = "UPDATE dbo.Table1 SET Name = @Name , CardType = @CardType ,ConnectionStatus = @Status , dateofjoin = @Date WHERE Account_No = @AccountNo";
 
 
                 SqlCommand cmd = new SqlCommand(query, conn);

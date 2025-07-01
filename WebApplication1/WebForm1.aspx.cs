@@ -26,20 +26,21 @@ namespace WebApplication1
 
         public void LoadData(string search = "")
         {
-
             string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             try
             {
-
                 Class1 dal = new Class1();
 
                 List<User> users = dal.GetUsers(search);
 
                 GridViewUsers.DataSource = users;
-
+                
                 GridViewUsers.DataBind();
 
+                userCount.Text = "Active Users : " + dal.GetActiveUsers().ToString();
+
+                CreditUserCount.Text = "Credit Card Users : " + dal.CreditUser().ToString();
 
             }
             catch (Exception ex)
@@ -49,6 +50,10 @@ namespace WebApplication1
             }
             Response.Write("<script>console.log('Search: " + search + "');</script>");
                 txtSearch.Text = "";
+        }
+
+        protected void ShowToast(string message)
+        {
 
         }
 
@@ -64,9 +69,7 @@ namespace WebApplication1
         protected void searchHandler(object sender, EventArgs e)
         {
             string search = txtSearch.Text.Trim();
-
             LoadData(search);
-
         }
     }
 }

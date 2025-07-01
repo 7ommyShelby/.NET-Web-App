@@ -25,29 +25,31 @@
 
         </div>
 
-        <%--<asp:Literal ID="LiteralCards" runat="server" />--%>
-
+        <div class="usercount">
+            <asp:Label ID="userCount" Text="" runat="server" />
+            <asp:Label ID="CreditUserCount" Text="" runat="server" />
+        </div>
 
         <asp:GridView ID="GridViewUsers" runat="server" AutoGenerateColumns="False" CssClass="table t1 table-hover"
             OnRowCommand="GridViewUsers_RowCommand"
-            DataKeyNames="AccoutNo">
+            DataKeyNames="AccountNo">
 
             <Columns>
 
                 <%--<asp:BoundField DataField="AccoutNo" HeaderStyle-Font-Bold="true" HeaderText="UID" ReadOnly="true" />--%>
 
                 <asp:TemplateField HeaderText="UID">
+
                     <ItemTemplate>
                         <asp:LinkButton ID="lnkEdit" runat="server"
-                            Text='<%# Eval("AccoutNo") %>'
+                            Text='<%# Eval("AccountNo") %>'
                             CommandName="EditUser"
-                            CommandArgument='<%# Eval("AccoutNo") %>'
+                            CommandArgument='<%# Eval("AccountNo") %>'
                             CssClass="text-primary text-decoration-underline">
                         </asp:LinkButton>
                     </ItemTemplate>
+
                 </asp:TemplateField>
-
-
 
                 <asp:BoundField DataField="Name" HeaderText="Name" />
 
@@ -56,11 +58,19 @@
                 <asp:BoundField DataField="ConnectionStatus" HeaderText="Connection Status" />
 
                 <asp:BoundField DataField="DateOfJoin" HeaderText="Date Of Joining" DataFormatString="{0:dd-MM-yyyy}" />
-                
 
             </Columns>
 
         </asp:GridView>
+
+        <div class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Hello, world! This is a toast message.
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
 
     </section>
 

@@ -42,6 +42,24 @@ namespace WebApplication1
         protected global::System.Web.UI.WebControls.HyperLink hlAddUser;
 
         /// <summary>
+        /// userCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label userCount;
+
+        /// <summary>
+        /// CreditUserCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label CreditUserCount;
+
+        /// <summary>
         /// GridViewUsers control.
         /// </summary>
         /// <remarks>

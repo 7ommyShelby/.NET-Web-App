@@ -35,7 +35,7 @@ namespace WebApplication1
             DateTime doj = !String.IsNullOrWhiteSpace(txtDate.Text) ? DateTime.Parse(txtDate.Text) : DateTime.Now.Date;
 
 
-            User newUser = new User { AccoutNo = accountNumber, Name = name, CardType = cardType, ConnectionStatus = status, DateOfJoin = doj };
+            User newUser = new User { AccountNo = accountNumber, Name = name, CardType = cardType, ConnectionStatus = status, DateOfJoin = doj };
 
             try
             {

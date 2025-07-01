@@ -13,12 +13,11 @@ namespace WebApplication1
 {
     public partial class EditUser : System.Web.UI.Page
     {
-
         protected void Page_Load(object sender, EventArgs e)
         {
 
             if (!IsPostBack)
-            {
+            { 
                 string accNo = Request.QueryString["AccountNo"];
                 if (!string.IsNullOrEmpty(accNo))
                 {
@@ -29,14 +28,13 @@ namespace WebApplication1
 
         protected void LoadUser(string acc)
         {
-
             string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(strcon))
             {
                 conn.Open();
 
-                SqlCommand cmd = new SqlCommand("SELECT * from dbo.Table1 WHERE A_No = @AccountNo", conn);
+                SqlCommand cmd = new SqlCommand("SELECT * from dbo.Table1 WHERE Account_No = @AccountNo", conn);
 
                 cmd.Parameters.AddWithValue("AccountNo", acc);
 
@@ -45,13 +43,11 @@ namespace WebApplication1
                 if (reader.Read())
                 {
                     txtName.Text = reader["Name"].ToString();
-                    CardType.SelectedValue = reader["Account_type"].ToString();
-                    statuslist.SelectedValue = reader["Status"].ToString();
+                    cardlist.SelectedValue = reader["CardType"].ToString();
+                    statuslist.SelectedValue = reader["ConnectionStatus"].ToString();
                     txtDate.Text = reader["dateofjoin"] == DBNull.Value ? DateTime.Now.ToString("yyyy-MM-dd") : Convert.ToDateTime(reader["dateofjoin"]).ToString("yyyy-MM-dd");
                 }
-
             }
-
         }
 
         protected void Updatehandler(object sender, EventArgs e)
@@ -60,12 +56,11 @@ namespace WebApplication1
 
             string name = txtName.Text.Trim();
 
-            string cardType = CardType.SelectedValue;
+            string cardType = cardlist.SelectedValue;
 
             string status = statuslist.SelectedValue;
 
             DateTime doj = !String.IsNullOrWhiteSpace(txtDate.Text) ? DateTime.Parse(txtDate.Text) : DateTime.Now.Date;
-
 
             try
             {
@@ -75,7 +70,7 @@ namespace WebApplication1
 
                 if (flag)
                 {
-                    lblMessage.Text = "User added successfully!";
+                    lblMessage.Text = "User updated successfully!";
 
                     Response.Redirect("WebForm1.aspx");
                 }
