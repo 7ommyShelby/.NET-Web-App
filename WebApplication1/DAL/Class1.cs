@@ -71,9 +71,10 @@ namespace WebApplication1.DAL
             return users;
 
         }
+
         public int GetActiveUsers()
         {
-            string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            //string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             int users = 0;
 
@@ -89,12 +90,11 @@ namespace WebApplication1.DAL
 
                     using (var reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
                             users = Convert.ToInt32(reader["ActiveUsers"]);
                         }
                     }
-
 
                     //var output = new SqlParameter("@count", SqlDbType.Int)
                     //{
@@ -132,7 +132,7 @@ namespace WebApplication1.DAL
 
         public int CreditUser()
         {
-            string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            //string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             int users = 0;
 
@@ -153,6 +153,48 @@ namespace WebApplication1.DAL
             }
             return users;
 
+        }
+
+
+        public List<User> GetActive()
+        {
+            List<User> users = new List<User>();
+
+            using (SqlConnection conn = new SqlConnection(strcon))
+            {
+                using (SqlCommand cmd = new SqlCommand("GetActive", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    try
+                    {
+
+                    conn.Open();
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                users.Add(new User
+                                {
+                                    AccountNo = Convert.ToInt32(reader["Account_No"]),
+                                    Name = reader["Name"].ToString(),
+                                    CardType = reader["CardType"].ToString(),
+                                    ConnectionStatus = reader["ConnectionStatus"].ToString(),
+                                    DateOfJoin = reader["dateofjoin"] == DBNull.Value ? DateTime.Now : Convert.ToDateTime(reader["dateofjoin"])
+                                });
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                       Console.WriteLine("<script>alert('Error fetching active users: " + ex.Message + "');</script>");
+                    }
+
+                }
+            }
+
+            return users;
         }
 
     }
@@ -189,7 +231,7 @@ namespace WebApplication1.DAL
 
         public bool DataSubmission(string accNo, string name, string cardType, string status, DateTime doj)
         {
-            string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            //string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             using (SqlConnection conn = new SqlConnection(strcon))
             {
@@ -212,7 +254,6 @@ namespace WebApplication1.DAL
             }
 
         }
-
     }
 
 }

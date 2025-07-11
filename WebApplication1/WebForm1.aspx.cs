@@ -19,47 +19,62 @@ namespace WebApplication1
 
             if (!IsPostBack)
             {
-                LoadData();
+                //string search = Request.QueryString["search"] ?? "";
+
+                string search = Session["search"] as string ?? "";
+
+                LoadData(search);
+
+                Session.Remove("search");
+
             }
 
         }
 
         public void LoadData(string search = "")
         {
-            string strcon = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
             try
             {
                 Class1 dal = new Class1();
 
-                List<User> users = dal.GetUsers(search);
+                //List<User> users = dal.GetUsers();
+
+                List<User> users = String.IsNullOrEmpty(search) ? dal.GetUsers() : dal.GetUsers(search);
 
                 GridViewUsers.DataSource = users;
-                
+
                 GridViewUsers.DataBind();
 
                 userCount.Text = "Active Users : " + dal.GetActiveUsers().ToString();
 
                 CreditUserCount.Text = "Credit Card Users : " + dal.CreditUser().ToString();
 
+                txtSearch.Text = search;
+
+                CallToast();
             }
             catch (Exception ex)
             {
                 // Log the exception or handle it as needed
                 Response.Write("An error occurred while loading data: " + ex.Message);
             }
-            Response.Write("<script>console.log('Search: " + search + "');</script>");
-                txtSearch.Text = "";
         }
 
-        protected void ShowToast(string message)
+
+
+        private void CallToast()
         {
 
+            string msg = "Page loaded successfully!";
+            string script = $"showToast('{msg.Replace("'", "\\'")}');";
+
+            ClientScript.RegisterStartupScript(this.GetType(), "ToastScript", script, true);
         }
 
-        protected void GridViewUsers_RowCommand(object sender , GridViewCommandEventArgs e)
+        protected void GridViewUsers_RowCommand(object sender, GridViewCommandEventArgs e)
         {
-            if(e.CommandName == "EditUser")
+            if (e.CommandName == "EditUser")
             {
                 string acc = e.CommandArgument.ToString();
                 Response.Redirect("EditUser.aspx?AccountNo=" + acc);
@@ -69,7 +84,26 @@ namespace WebApplication1
         protected void searchHandler(object sender, EventArgs e)
         {
             string search = txtSearch.Text.Trim();
-            LoadData(search);
+
+            //Response.Redirect("WebForm1.aspx?search=" + Server.UrlEncode(search));
+
+            Session["search"] = search;
+            Response.Redirect("Webform1.aspx");
+
+            txtSearch.Text = "";
+        }
+
+        public void activeUserHandler(object sender, EventArgs e)
+        {
+
+            Class1 dal = new Class1();
+
+            var activeUsers = dal.GetActive();
+
+            GridViewUsers.DataSource = activeUsers;
+
+            GridViewUsers.DataBind();
+
         }
     }
 }

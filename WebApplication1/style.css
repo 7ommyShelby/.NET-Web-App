@@ -73,6 +73,31 @@ padding : 10px 20px;
     display : flex;
     align-items :center;
     justify-content : space-evenly;
+    margin-bottom: 2rem;
 }
+
+.toast-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: palevioletred;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    font-family: sans-serif;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 9999;
+}
+
+.toast-box.show {
+    opacity: 1;
+}
+
+.d-none {
+    display: none;
+}
+
 
 
